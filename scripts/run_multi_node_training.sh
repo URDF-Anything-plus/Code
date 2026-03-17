@@ -4,10 +4,6 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 cd "$REPO_ROOT"
 
-export http_proxy=${http_proxy:-http://192.168.32.28:18000}
-export https_proxy=${https_proxy:-http://192.168.32.28:18000}
-export PATH="/mnt/world_foundational_model/luoyulin/wzz_temp/envs/urdf_extracted/bin:$PATH"
-
 NODE_RANK=${1:-0}
 MASTER_ADDR=${2:-localhost}
 NPROC_PER_NODE=${3:-8}
@@ -23,7 +19,7 @@ export MASTER_ADDR=$MASTER_ADDR
 export MASTER_PORT=${MASTER_PORT:-12356}
 export CUDA_VISIBLE_DEVICES=$(seq -s, 0 $((NPROC_PER_NODE-1)))
 
-NNODES=3
+NNODES=1
 WORLD_SIZE=$((NNODES * NPROC_PER_NODE))
 
 echo "=========================================="
@@ -55,7 +51,6 @@ else
     fi
 fi
 
-export WANDB_API_KEY=54fd5803363ff3ee55a420f3140939639ce27d38
 
 echo ""
 echo "Starting multi-node distributed training..."
@@ -68,7 +63,7 @@ torchrun \
     --master_port=$MASTER_PORT \
     scripts/train.py \
     --batch_size 2 \
-    --cache_path cache/laptop_eot_token512 cache/microwave_eot_token512 cache/refrigerator_eot_token512 cache/scissors_eot_token512 cache/storagefurniture_eot_token512 cache/display_eot_token512 cache/door_eot_token512 cache/faucet_eot_token512 cache/knife_eot_token512 cache/dishwasher_eot_token512 \
+    --cache_path cache/laptop_eot_token512 \
     --init_mode resume_from_ckpt \
     --checkpoint_path checkpoints/lr1e-5_bs2_ep500/epoch_500.pth \
     --learning_rate 1e-5 \

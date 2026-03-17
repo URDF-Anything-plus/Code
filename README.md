@@ -1,30 +1,59 @@
 # URDF-Anything+: Autoregressive Articulated 3D Models Generation for Physical Simulation
-[[Website](https://urdf-anything-plus.github.io/)] [[arXiv]()] [[Dataset](https://huggingface.co/datasets/URDF-Anything-plus/Dataset)]
+<p align="center">
+  <a href="https://urdf-anything-plus.github.io/"><img alt="Website" src="https://img.shields.io/badge/Website-Project%20Page-1f2937?style=flat-square&logo=googlechrome&logoColor=white"></a>
+  <a href="https://arxiv.org/pdf/2603.14010"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2603.14010-b31b1b?style=flat-square&logo=arxiv&logoColor=white"></a>
+  <a href="https://huggingface.co/datasets/URDF-Anything-plus/Dataset"><img alt="Dataset" src="https://img.shields.io/badge/Dataset-Hugging%20Face-ffb000?style=flat-square&logo=huggingface&logoColor=000"></a>
+  <a href="https://huggingface.co/URDF-Anything-plus/URDF-Anything-Plus-Model"><img alt="Model" src="https://img.shields.io/badge/Model-Hugging%20Face-3b82f6?style=flat-square&logo=huggingface&logoColor=white"></a>
+</p>
+
+<div align="center">
+  <div>
+    <span class="author-block">
+      <a href="https://zhuangzhewu.github.io/">Zhuangzhe Wu</a><sup>1</sup>,</span>
+    <span class="author-block">
+      <a href="https://github.com/vinkda">Yue Xin</a><sup>1</sup>,</span>
+    <span class="author-block">
+      <a href="https://jackhck.github.io/">Chengkai Hou</a><sup>1</sup>,</span>
+    <span class="author-block">
+      <a href="https://silent-chen.github.io/">Minghao Chen</a><sup>2</sup>,</span>
+    <span class="author-block">
+      <a href="https://scholar.google.com/citations?user=cpPgzGkAAAAJ">Yaoxu Lyu</a><sup>1</sup>,</span>
+    <span class="author-block">
+      <a href="https://jieyuz2.github.io/">Jieyu Zhang</a><sup>3</sup>,</span>
+    <span class="author-block">
+      <a href="https://scholar.google.com/citations?hl=en&user=voqw10cAAAAJ&view_op=list_works&sortby=pubdate">Shanghang Zhang</a><sup>1</sup></span>
+  </div>
+</div>
 
 ## Requirements
 ### Python environment
-1. **Create a conda environment**
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/URDF-Anything-plus/URDF-Anything-plus.git
+   cd URDF-Anything-plus
+   ```
+2. **Create a conda environment**
    ```bash
    conda create -n urdf-anything python=3.10 -y
    conda activate urdf-anything
    ```
 
-2. **Install PyTorch**
+3. **Install PyTorch**
    ```bash
    pip install torch==2.6.0 torchvision==0.21.0 
    ```
 
-3. **Install dependencies**：
+4. **Install dependencies**：
    ```bash
    pip install -r  -u requirements.txt -i https://pypi.org/simple/
    ```
 
-4. **Install torch-cluster**。Must be installed after PyTorch:
+5. **Install torch-cluster**。Must be installed after PyTorch:
    ```bash
    pip install torch-cluster --no-build-isolation
    ```
    
-5. **Install diso**（TripoSG mesh extraction will use it）. Must be installed after PyTorch:
+6. **Install diso**（TripoSG mesh extraction will use it）. Must be installed after PyTorch:
    ```bash
    pip install diso --no-build-isolation
    ```
@@ -33,10 +62,6 @@
 
 **Hugging Face authentication**（recommended to configure before downloading models）：
 
-<!-- 1. 在 [Hugging Face → Settings → Access Tokens](https://huggingface.co/settings/tokens) 创建 Token（Read 权限即可）。
-2. 任选一种方式配置：
-   - **命令行登录**（推荐）：`huggingface-cli login`，按提示粘贴 Token。
-   - **环境变量**：`export HF_TOKEN=你的token` 或 `export HUGGING_FACE_HUB_TOKEN=你的token`（可写入 `~/.bashrc` 或 `~/.zshrc`）。 -->
 
 **Setup:** Clone [TripoSG](https://github.com/VAST-AI-Research/TripoSG) (used for 3D geometry)，and download the weights in `TripoSG/pretrained_weights/`：
 
@@ -122,15 +147,25 @@ In finetuning stage, we use the following hyperparameters:
 ```
 
 ## Inference
+
+You can try our inference script:
 ```bash
 bash scripts/inference.sh
 ```
-If you are in 'in_the_wild' mode, you need to check the orientation of the generated mesh:
-```bash
-可选：在终端中对 mesh 做简单旋转。可多次旋转，直接回车结束。
-  0: 不旋转（直接回车也等价于结束）
-  1-6: 围绕 X/Y/Z 轴 ±90°
-angle_map_print: {'1': '绕X轴旋转90度', '2': '绕X轴旋转-90度', '3': '绕Y轴旋转90度', '4': '绕Y轴旋转-90度', '5': '绕Z轴旋转90度', '6': '绕Z轴旋转-90度'}
-输入旋转编号并回车（直接回车=确认并结束旋转）[0-6]: 
+
+If you are in 'in_the_wild' mode, you should make sure the object is oriented towards the positive z direction. See the examples below, the z-axis is the blue line. 
+<p align="center">
+  <img src="assets/laptop_example.png" alt="Laptop Example" width="33%" style="display:inline-block" />
+  <img src="assets/display_example.png" alt="Display Example" width="30%" style="display:inline-block;" />
+  <img src="assets/faucet_example.png" alt="Faucet Example" width="30%" style="display:inline-block" />
+</p>
+
+You can rotate the mesh in the terminal to check the orientation. The rotation commands are as follows:
+```
+Optional: rotate the mesh in the terminal. You need to make sure the object is oriented towards the positive z direction. You can rotate multiple times, press Enter to end.
+  0: no rotation (pressing Enter is equivalent to ending)
+  1-6: rotate around X/Y/Z axis ±90°
+angle_map_print: {'1': 'rotate around X axis 90°', '2': 'rotate around X axis -90°', '3': 'rotate around Y axis 90°', '4': 'rotate around Y axis -90°', '5': 'rotate around Z axis 90°', '6': 'rotate around Z axis -90°'}
+Enter the rotation number and press Enter (pressing Enter is equivalent to ending): [0-6]:
 ```
 You need to make sure the object is oriented towards the positive z direction.

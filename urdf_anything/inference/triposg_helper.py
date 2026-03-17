@@ -104,7 +104,7 @@ def get_3d_triposg(
             )
     mesh.export(os.path.join(output_dir, "mesh_for_edit.obj"))
 
-    print("\nOptional: rotate the mesh in the terminal. You can rotate multiple times, press Enter to end.")
+    print("\nOptional: rotate the mesh in the terminal. You need to make sure the object is oriented towards the positive z direction. You can rotate multiple times, press Enter to end.")
     print("  0: no rotation (pressing Enter is equivalent to ending)")
     print("  1-6: rotate around X/Y/Z axis ±90°")
 

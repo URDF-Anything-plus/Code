@@ -4,6 +4,10 @@ Run from repo root: python scripts/inference.py --image_path ... --model_path ..
 """
 import os
 import sys
+import argparse
+import random
+import numpy as np
+import torch
 
 _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _root not in sys.path:
@@ -14,7 +18,6 @@ _triposg_root = os.path.join(_root, "TripoSG")
 if _triposg_root not in sys.path:
     sys.path.insert(0, _triposg_root)
 
-import argparse
 from urdf_anything.inference import URDFInference, get_3d_triposg
 
 
@@ -49,8 +52,21 @@ def main():
     parser.add_argument("--eot_threshold", type=float, default=0.5)
     parser.add_argument("--max_reconstruction_attempts", type=int, default=3)
     parser.add_argument("--overlap_chamfer_threshold", type=float, default=3e-2)
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="random seed for TripoSG and PyTorch",
+    )
 
     args = parser.parse_args()
+
+    # Set random seeds for reproducibility
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if args.device.startswith("cuda") and torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
 
     if not args.in_the_wild and not args.whole_mesh_path:
         raise ValueError(
@@ -87,6 +103,7 @@ def main():
         whole_mesh = get_3d_triposg(
             image_path=args.image_path,
             device=args.device,
+            seed=args.seed,
             triposg_weights_dir=args.triposg_weights_dir,
             rmbg_weights_dir=args.rmbg_weights_dir,
             # target_faces=10000, 
